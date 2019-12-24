@@ -2,12 +2,15 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -15,7 +18,7 @@ public class Main {
         final String url = "https://www.gog.com/";
         final String screenShotDir = System.getProperty("user.dir") + "/conf/";
         //Create the WebDriver instance
-        WebDriver driver = new MarionetteDriver().getFirefoxDriver();
+        WebDriver driver = getFirefoxDriver();
 
         //Open the website
         driver.get(url);
@@ -71,5 +74,22 @@ public class Main {
         }
 
         return percentage;
+    }
+
+    private static WebDriver getFirefoxDriver() {
+        final DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+        capabilities.setCapability("marionette", true);
+        setGeckoDriver();
+        final WebDriver driver = new FirefoxDriver();
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().window().maximize();
+        return driver;
+    }
+
+    private static void setGeckoDriver() {
+        String pathToDriver = System.getProperty("user.dir") + "/conf/geckodriver.exe";
+        final File file = new File(pathToDriver);
+        System.setProperty("webdriver.gecko.driver", file.getAbsolutePath());
+        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");
     }
 }
